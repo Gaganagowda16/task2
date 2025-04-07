@@ -11,7 +11,7 @@ This project demonstrates a complete CI/CD pipeline for a Node.js application us
 - **Docker**: The app is containerized using a Dockerfile.
 - **GitHub Actions**: CI/CD pipeline is configured to:
   - Install dependencies
-  - Run tests
+  - Run tests 
   - Build Docker image
   - Push image to DockerHub
 
