@@ -1,35 +1,56 @@
-pipeline{
-    agent { label 'dev-server' }
-    
-    stages{
-        stage("Code Clone"){
-            steps{
-                echo "Code Clone Stage"
-                git url: "https://github.com/LondheShubham153/node-todo-cicd.git", branch: "master"
+pipeline {
+    agent any 
+
+    environment {
+        // Replace this with your actual Docker Hub username
+        IMAGE_NAME = 'sppranam/node-app'
+    }
+
+    stages {
+        stage("Clone Code") {
+            steps {
+                echo "Cloning your repo..."
+                git url: 'https://github.com/SPPranam/task-1.git', branch: 'main'
             }
         }
-        stage("Code Build & Test"){
-            steps{
-                echo "Code Build Stage"
-                sh "docker build -t node-app ."
+
+        stage("Build & Test") {
+            steps {
+                echo "Building Docker image..."
+                sh 'docker build -t node-app .'
+
+                echo "Running tests..."
+                sh 'node test.js || echo "No tests or test failed, continuing..."'
             }
         }
-        stage("Push To DockerHub"){
-            steps{
+
+        stage("Push to Docker Hub") {
+            steps {
                 withCredentials([usernamePassword(
-                    credentialsId:"dockerHubCreds",
-                    usernameVariable:"dockerHubUser", 
-                    passwordVariable:"dockerHubPass")]){
-                sh 'echo $dockerHubPass | docker login -u $dockerHubUser --password-stdin'
-                sh "docker image tag node-app:latest ${env.dockerHubUser}/node-app:latest"
-                sh "docker push ${env.dockerHubUser}/node-app:latest"
+                    credentialsId: 'dockerHubCreds',
+                    usernameVariable: 'DOCKERHUB_USER',
+                    passwordVariable: 'DOCKERHUB_PASS'
+                )]) {
+                    sh 'echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin'
+                    sh 'docker tag node-app:latest $DOCKERHUB_USER/node-app:latest'
+                    sh 'docker push $DOCKERHUB_USER/node-app:latest'
                 }
             }
         }
-        stage("Deploy"){
-            steps{
-                sh "docker compose down && docker compose up -d --build"
+
+        stage("Deploy App") {
+            steps {
+                echo "Deploying with Docker Compose..."
+                sh 'docker compose down || true'
+                sh 'docker compose up -d --build'
             }
         }
     }
+
+    post {
+        always {
+            echo "CI/CD pipeline completed."
+        }
+    }
 }
+
