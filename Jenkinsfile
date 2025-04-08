@@ -1,5 +1,5 @@
 pipeline {
-    agent any 
+    agent any
 
     environment {
         // Replace this with your actual Docker Hub username
@@ -17,10 +17,10 @@ pipeline {
         stage("Build & Test") {
             steps {
                 echo "Building Docker image..."
-                sh 'docker build -t node-app .'
+                sh 'cd node-todo-cicd && docker build -t node-app .'
 
                 echo "Running tests..."
-                sh 'node test.js || echo "No tests or test failed, continuing..."'
+                sh 'cd node-todo-cicd && node test.js || echo "No tests or test failed, continuing..."'
             }
         }
 
@@ -41,8 +41,8 @@ pipeline {
         stage("Deploy App") {
             steps {
                 echo "Deploying with Docker Compose..."
-                sh 'docker compose down || true'
-                sh 'docker compose up -d --build'
+                sh 'cd node-todo-cicd && docker compose down || true'
+                sh 'cd node-todo-cicd && docker compose up -d --build'
             }
         }
     }
