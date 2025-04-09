@@ -2,15 +2,14 @@ pipeline {
     agent any
 
     environment {
-        // Replace this with your actual Docker Hub username
-        IMAGE_NAME = 'sppranam/node-app'
+        IMAGE_NAME = 'gaganat16/node-app'
     }
 
     stages {
         stage("Clone Code") {
             steps {
                 echo "Cloning your repo..."
-                git url: 'https://github.com/SPPranam/task-1.git', branch: 'main'
+                git url: 'https://github.com/Gaganagowda16/task2.git', branch: 'main'
             }
         }
 
@@ -44,12 +43,6 @@ pipeline {
                 sh 'cd node-todo-cicd && docker compose down || true'
                 sh 'cd node-todo-cicd && docker compose up -d --build'
             }
-        }
-    }
-
-    post {
-        always {
-            echo "CI/CD pipeline completed."
         }
     }
 }
